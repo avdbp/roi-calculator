@@ -1,0 +1,43 @@
+# No subir node_modules
+node_modules/
+
+# No subir package.json y package-lock.json
+package.json
+package-lock.json
+
+# Archivos de entorno
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Directorios temporales
+dist/
+build/
+.tmp/
+.temp/
+.cache/
+coverage/
+
+# Sistemas operativos
+.DS_Store
+Thumbs.db
+
+# Archivos de edición y backups
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Archivos de configuración de editores
+.vscode/
+.idea/
+
+# Salida de tests
+test-output/
