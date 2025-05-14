@@ -25,6 +25,8 @@ const Home = () => {
   const [showCoaching, setShowCoaching] = useState(true);
   const [showDevelopment, setShowDevelopment] = useState(true);
 
+  const [resetKey, setResetKey] = useState(0);
+
   const grandTotal =
     (showSupport ? supportTotal : 0) +
     (showCoaching ? coachingTotal : 0) +
@@ -33,7 +35,7 @@ const Home = () => {
   const handleDownload = () => {
     const doc = new jsPDF();
     doc.setFontSize(18);
-    doc.text("ROI Report - Agentforce", 14, 22);
+    doc.text("ROI Report", 14, 22);
     doc.setFontSize(12);
     doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
 
@@ -60,6 +62,13 @@ const Home = () => {
     doc.save("ROI_Report.pdf");
   };
 
+  const handleReset = () => {
+    setResetKey((prev) => prev + 1);
+    setSupportTotal(0);
+    setCoachingTotal(0);
+    setDevTotal(0);
+  };
+
   return (
     <Container maxWidth="lg" style={{ marginTop: "40px", marginBottom: "40px" }}>
       <Paper elevation={3} style={{ padding: "30px", marginBottom: "40px" }}>
@@ -77,6 +86,11 @@ const Home = () => {
             <Grid item>
               <Button variant="contained" color="primary" onClick={handleDownload}>
                 Download Report
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button variant="outlined" color="secondary" onClick={handleReset}>
+                Reset All Inputs
               </Button>
             </Grid>
           </Grid>
@@ -98,9 +112,47 @@ const Home = () => {
         />
       </Box>
 
-      {showSupport && <CustomerSupport onTotalChange={setSupportTotal} />}
-      {showCoaching && <SalesCoaching onTotalChange={setCoachingTotal} />}
-      {showDevelopment && <SalesDevelopment onTotalChange={setDevTotal} />}
+      {showSupport && (
+        <CustomerSupport
+          key={`support-${resetKey}`}
+          onTotalChange={setSupportTotal}
+          defaultValues={{
+            employees: 0,
+            annualCost: 0,
+            conversations: 0,
+            percentShifted: 0,
+            autoCostPerConversation: 0,
+          }}
+        />
+      )}
+
+      {showCoaching && (
+        <SalesCoaching
+          key={`coaching-${resetKey}`}
+          onTotalChange={setCoachingTotal}
+          defaultValues={{
+            employees: 0,
+            annualCoachCost: 0,
+            sessionsPerRepPerMonth: 0,
+            percentShifted: 0,
+            autoCostPerSession: 0,
+          }}
+        />
+      )}
+
+      {showDevelopment && (
+        <SalesDevelopment
+          key={`development-${resetKey}`}
+          onTotalChange={setDevTotal}
+          defaultValues={{
+            employees: 0,
+            annualSDRCost: 0,
+            outreachPerDay: 0,
+            percentShifted: 0,
+            autoCostPerOutreach: 0,
+          }}
+        />
+      )}
     </Container>
   );
 };
