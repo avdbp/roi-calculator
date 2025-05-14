@@ -1,9 +1,5 @@
-# No subir node_modules
+# node modules
 node_modules/
-
-# No subir package.json y package-lock.json
-package.json
-package-lock.json
 
 # Archivos de entorno
 .env
@@ -35,9 +31,10 @@ Thumbs.db
 *.bak
 *.tmp
 
-# Archivos de configuración de editores
+# Configuraciones de editores
 .vscode/
 .idea/
 
 # Salida de tests
 test-output/
+.vercel
