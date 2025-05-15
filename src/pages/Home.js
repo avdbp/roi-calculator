@@ -4,11 +4,15 @@ import {
   Typography,
   Box,
   Button,
-  Grid,
-  Paper,
-  Switch,
   FormControlLabel,
+  Switch,
+  Paper,
+  Grid,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -17,20 +21,26 @@ import SalesCoaching from "../components/SalesCoaching";
 import SalesDevelopment from "../components/SalesDevelopment";
 
 const Home = () => {
-  const [supportTotal, setSupportTotal] = useState(0);
-  const [coachingTotal, setCoachingTotal] = useState(0);
-  const [devTotal, setDevTotal] = useState(0);
+  const [supportData, setSupportData] = useState(null);
+  const [coachingData, setCoachingData] = useState(null);
+  const [devData, setDevData] = useState(null);
+  const [resetKey, setResetKey] = useState(0);
 
   const [showSupport, setShowSupport] = useState(true);
   const [showCoaching, setShowCoaching] = useState(true);
   const [showDevelopment, setShowDevelopment] = useState(true);
 
-  const [resetKey, setResetKey] = useState(0);
-
   const grandTotal =
-    (showSupport ? supportTotal : 0) +
-    (showCoaching ? coachingTotal : 0) +
-    (showDevelopment ? devTotal : 0);
+    (supportData?.savings || 0) +
+    (coachingData?.savings || 0) +
+    (devData?.savings || 0);
+
+  const handleReset = () => {
+    setSupportData(null);
+    setCoachingData(null);
+    setDevData(null);
+    setResetKey((prev) => prev + 1);
+  };
 
   const handleDownload = () => {
     const doc = new jsPDF();
@@ -39,120 +49,166 @@ const Home = () => {
     doc.setFontSize(12);
     doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
 
-    const rows = [];
+    const sections = [supportData, coachingData, devData].filter(Boolean);
+    let currentY = 40;
 
-    if (showSupport) {
-      rows.push(["Customer Support", `$${supportTotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}`]);
-    }
-    if (showCoaching) {
-      rows.push(["Sales Coaching", `$${coachingTotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}`]);
-    }
-    if (showDevelopment) {
-      rows.push(["Sales Development", `$${devTotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}`]);
-    }
+    sections.forEach((data) => {
+      doc.setFontSize(14);
+      doc.text(data.section, 14, currentY);
 
-    rows.push(["Total Savings (3 years)", `$${grandTotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}`]);
+      autoTable(doc, {
+        startY: currentY + 5,
+        head: [["Metric", "Value"]],
+        body: [
+          ["Employees", data.employees],
+          ["Annual Cost per Employee", `$${data.annualCost.toFixed(2)}`],
+          ["Conversations per Day", data.conversationsPerDay],
+          ["% Shifted to Automation", `${data.percentShifted}%`],
+          ["Automated Cost per Conversation", `$${data.autoCostPerConversation.toFixed(2)}`],
+          ["Total Conversations", data.totalConversations.toLocaleString()],
+          ["Shifted Conversations", data.shiftedConversations.toLocaleString()],
+          ["Cost Without Automation", `$${data.currentCost.toFixed(2)}`],
+          ["Cost With Automation", `$${data.autoCost.toFixed(2)}`],
+          ["Total Savings", `$${data.savings.toFixed(2)}`],
+          ["ROI", `${data.roi.toFixed(2)}%`],
+        ],
+      });
 
-    autoTable(doc, {
-      startY: 40,
-      head: [["Section", "Savings"]],
-      body: rows,
+      currentY = doc.lastAutoTable.finalY + 15;
+
+      if (currentY > 250) {
+        doc.addPage();
+        currentY = 20;
+      }
     });
 
-    doc.save("ROI_Report.pdf");
-  };
+    doc.addPage();
+    autoTable(doc, {
+      startY: 20,
+      head: [["Section", "Savings"]],
+      body: sections.map((s) => [s.section, `$${s.savings.toFixed(2)}`]),
+    });
 
-  const handleReset = () => {
-    setResetKey((prev) => prev + 1);
-    setSupportTotal(0);
-    setCoachingTotal(0);
-    setDevTotal(0);
+    doc.text(`Grand Total Savings: $${grandTotal.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 10);
+    doc.save("roi_report_detailed.pdf");
   };
 
   return (
-    <Container maxWidth="lg" style={{ marginTop: "40px", marginBottom: "40px" }}>
-      <Paper elevation={3} style={{ padding: "30px", marginBottom: "40px" }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          ROI Calculator
+    <Container maxWidth={false} sx={{ py: 4 }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: 4,
+          mb: 4,
+          mx: "auto",
+          maxWidth: "1100px",
+        }}
+      >
+        <Typography variant="h6" gutterBottom>
+          Select Sections
         </Typography>
-
-        <Box mt={4} textAlign="center">
-          <Typography variant="h5">3-year total net savings</Typography>
-          <Typography variant="h3" color="primary" gutterBottom>
-            ${grandTotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-          </Typography>
-
-          <Grid container spacing={2} justifyContent="center">
-            <Grid item>
-              <Button variant="contained" color="primary" onClick={handleDownload}>
-                Download Report
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button variant="outlined" color="secondary" onClick={handleReset}>
-                Reset All Inputs
-              </Button>
-            </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={4}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showSupport}
+                  onChange={(e) => setShowSupport(e.target.checked)}
+                />
+              }
+              label="Customer Support"
+            />
           </Grid>
-        </Box>
+          <Grid item xs={12} sm={4}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showCoaching}
+                  onChange={(e) => setShowCoaching(e.target.checked)}
+                />
+              }
+              label="Sales Coaching"
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showDevelopment}
+                  onChange={(e) => setShowDevelopment(e.target.checked)}
+                />
+              }
+              label="Sales Development"
+            />
+          </Grid>
+        </Grid>
       </Paper>
 
-      <Box mb={3}>
-        <FormControlLabel
-          control={<Switch checked={showSupport} onChange={() => setShowSupport(!showSupport)} />}
-          label="Customer Support"
-        />
-        <FormControlLabel
-          control={<Switch checked={showCoaching} onChange={() => setShowCoaching(!showCoaching)} />}
-          label="Sales Coaching"
-        />
-        <FormControlLabel
-          control={<Switch checked={showDevelopment} onChange={() => setShowDevelopment(!showDevelopment)} />}
-          label="Sales Development"
-        />
+      <Box sx={{ mx: "auto", maxWidth: "1100px" }}>
+        {showSupport && (
+          <Accordion defaultExpanded>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6">Customer Support</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <CustomerSupport
+                key={`support-${resetKey}`}
+                onTotalChange={setSupportData}
+              />
+            </AccordionDetails>
+          </Accordion>
+        )}
+
+        {showCoaching && (
+          <Accordion defaultExpanded>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6">Sales Coaching</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <SalesCoaching
+                key={`coaching-${resetKey}`}
+                onTotalChange={setCoachingData}
+              />
+            </AccordionDetails>
+          </Accordion>
+        )}
+
+        {showDevelopment && (
+          <Accordion defaultExpanded>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6">Sales Development</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <SalesDevelopment
+                key={`development-${resetKey}`}
+                onTotalChange={setDevData}
+              />
+            </AccordionDetails>
+          </Accordion>
+        )}
+
+        <Box mt={4} textAlign="center">
+          <Typography variant="h6">
+            Total Estimated Savings: ${grandTotal.toFixed(2)}
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleDownload}
+            sx={{ mt: 2, mr: 2 }}
+          >
+            Download Detailed Report
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleReset}
+            sx={{ mt: 2 }}
+          >
+            Reset Calculator
+          </Button>
+        </Box>
       </Box>
-
-      {showSupport && (
-        <CustomerSupport
-          key={`support-${resetKey}`}
-          onTotalChange={setSupportTotal}
-          defaultValues={{
-            employees: 0,
-            annualCost: 0,
-            conversations: 0,
-            percentShifted: 0,
-            autoCostPerConversation: 0,
-          }}
-        />
-      )}
-
-      {showCoaching && (
-        <SalesCoaching
-          key={`coaching-${resetKey}`}
-          onTotalChange={setCoachingTotal}
-          defaultValues={{
-            employees: 0,
-            annualCoachCost: 0,
-            sessionsPerRepPerMonth: 0,
-            percentShifted: 0,
-            autoCostPerSession: 0,
-          }}
-        />
-      )}
-
-      {showDevelopment && (
-        <SalesDevelopment
-          key={`development-${resetKey}`}
-          onTotalChange={setDevTotal}
-          defaultValues={{
-            employees: 0,
-            annualSDRCost: 0,
-            outreachPerDay: 0,
-            percentShifted: 0,
-            autoCostPerOutreach: 0,
-          }}
-        />
-      )}
     </Container>
   );
 };
