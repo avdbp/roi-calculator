@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Grid,
@@ -67,55 +68,58 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
   ]);
 
   return (
-    <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
+    <Paper elevation={3} sx={{ p: { xs: 2, md: 4 }, mt: 4 }}>
       <Typography variant="h6" gutterBottom>
         {title}
       </Typography>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
           <TextField
             fullWidth
             label="Employees"
+            InputLabelProps={{ shrink: true }}
             type="number"
             value={employees}
             onChange={(e) => setEmployees(e.target.value)}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label="Average Annual Cost per Employee ($)"
+            label="Annual cost per employee"
+            InputLabelProps={{ shrink: true }}
             type="number"
             value={annualCost}
             onChange={(e) => setAnnualCost(e.target.value)}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label="Conversations per Day per Employee"
+            label="Conversations per day"
+            InputLabelProps={{ shrink: true }}
             type="number"
             value={conversations}
             onChange={(e) => setConversations(e.target.value)}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
-          <Box>
-            <Typography gutterBottom>% Shifted to Automation</Typography>
-            <Slider
-              value={percentShifted}
-              onChange={(e, val) => setPercentShifted(val)}
-              min={0}
-              max={100}
-              step={1}
-              valueLabelDisplay="auto"
-            />
-          </Box>
+        <Grid item xs={12} md={6}>
+          <Slider
+            value={percentShifted}
+            onChange={(e, newValue) => setPercentShifted(newValue)}
+            valueLabelDisplay="auto"
+            min={0}
+            max={100}
+          />
+          <Typography variant="body2">
+            Percentage of conversations shifted: {percentShifted}%
+          </Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12}>
           <TextField
             fullWidth
-            label="Automated System Cost per Conversation ($)"
+            label="Automated cost per conversation"
+            InputLabelProps={{ shrink: true }}
             type="number"
             value={autoCostPerConversation}
             onChange={(e) => setAutoCostPerConversation(e.target.value)}
@@ -123,13 +127,13 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
         </Grid>
       </Grid>
 
-      <Box mt={4}>
-        <Typography variant="subtitle1">Results</Typography>
-        <Table>
+      <Box mt={4} sx={{ overflowX: "auto" }}>
+        <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Metric</TableCell>
-              <TableCell>Value</TableCell>
+              <TableCell colSpan={2}>
+                <strong>ROI Summary</strong>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -142,16 +146,16 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
               <TableCell>{shiftedConversations.toLocaleString()}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Cost Without Automation</TableCell>
-              <TableCell>${currentCost.toFixed(2)}</TableCell>
+              <TableCell>Current Cost</TableCell>
+              <TableCell>${currentCost.toLocaleString(undefined, { maximumFractionDigits: 2 })}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Cost With Automation</TableCell>
-              <TableCell>${autoCost.toFixed(2)}</TableCell>
+              <TableCell>Automated Cost</TableCell>
+              <TableCell>${autoCost.toLocaleString(undefined, { maximumFractionDigits: 2 })}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Total Savings</TableCell>
-              <TableCell>${savings.toFixed(2)}</TableCell>
+              <TableCell>Savings</TableCell>
+              <TableCell>${savings.toLocaleString(undefined, { maximumFractionDigits: 2 })}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>ROI</TableCell>
@@ -161,12 +165,10 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
         </Table>
       </Box>
 
-      {savings <= 0 && (
-        <Box mt={2}>
-          <Alert severity="warning">
-            No savings are generated with these values. The automated system cost is higher than the current cost per conversation.
-          </Alert>
-        </Box>
+      {savings < 0 && (
+        <Alert severity="warning" sx={{ mt: 2 }}>
+          ⚠️ No se genera ahorro con estos valores. El costo actual por conversación es menor al automatizado.
+        </Alert>
       )}
     </Paper>
   );

@@ -19,8 +19,22 @@ import autoTable from "jspdf-autotable";
 import CustomerSupport from "../components/CustomerSupport";
 import SalesCoaching from "../components/SalesCoaching";
 import SalesDevelopment from "../components/SalesDevelopment";
+import HeroHeader from "../components/HeroHeader";
+import Header from "../components/Header";
+
 
 const Home = () => {
+  const header = (
+    <Box textAlign="center" mt={6} mb={4}>
+      <Typography variant="h4" gutterBottom>
+        ROI Calculator
+      </Typography>
+      <Typography variant="subtitle1">
+        Estima los ahorros que puedes lograr mediante automatización en atención al cliente, ventas y desarrollo comercial.
+      </Typography>
+    </Box>
+  );
+
   const [supportData, setSupportData] = useState(null);
   const [coachingData, setCoachingData] = useState(null);
   const [devData, setDevData] = useState(null);
@@ -61,16 +75,16 @@ const Home = () => {
         head: [["Metric", "Value"]],
         body: [
           ["Employees", data.employees],
-          ["Annual Cost per Employee", `$${data.annualCost.toFixed(2)}`],
+          ["Annual Cost per Employee", `$${data.annualCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
           ["Conversations per Day", data.conversationsPerDay],
           ["% Shifted to Automation", `${data.percentShifted}%`],
-          ["Automated Cost per Conversation", `$${data.autoCostPerConversation.toFixed(2)}`],
+          ["Automated Cost per Conversation", `$${data.autoCostPerConversation.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
           ["Total Conversations", data.totalConversations.toLocaleString()],
           ["Shifted Conversations", data.shiftedConversations.toLocaleString()],
-          ["Cost Without Automation", `$${data.currentCost.toFixed(2)}`],
-          ["Cost With Automation", `$${data.autoCost.toFixed(2)}`],
-          ["Total Savings", `$${data.savings.toFixed(2)}`],
-          ["ROI", `${data.roi.toFixed(2)}%`],
+          ["Cost Without Automation", `$${data.currentCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
+          ["Cost With Automation", `$${data.autoCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
+          ["Total Savings", `$${data.savings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
+          ["ROI", `${data.roi.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`],
         ],
       });
 
@@ -86,15 +100,16 @@ const Home = () => {
     autoTable(doc, {
       startY: 20,
       head: [["Section", "Savings"]],
-      body: sections.map((s) => [s.section, `$${s.savings.toFixed(2)}`]),
+      body: sections.map((s) => [s.section, `$${s.savings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`]),
     });
 
-    doc.text(`Grand Total Savings: $${grandTotal.toFixed(2)}`, 14, doc.lastAutoTable.finalY + 10);
+    doc.text(`Grand Total Savings: $${grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 14, doc.lastAutoTable.finalY + 10);
     doc.save("roi_report_detailed.pdf");
   };
 
   return (
     <Container maxWidth={false} sx={{ py: 4 }}>
+      <HeroHeader total={grandTotal} onDownload={handleDownload} />
       <Paper
         elevation={3}
         sx={{
@@ -189,7 +204,7 @@ const Home = () => {
 
         <Box mt={4} textAlign="center">
           <Typography variant="h6">
-            Total Estimated Savings: ${grandTotal.toFixed(2)}
+            Total Estimated Savings: ${grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </Typography>
           <Button
             variant="contained"
