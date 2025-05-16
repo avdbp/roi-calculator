@@ -20,8 +20,15 @@ const HeroHeader = ({ total, onDownload }) => {
       <Typography variant="h6" gutterBottom>
         3-year total net savings
       </Typography>
-      <Typography variant="h3" color="primary" gutterBottom>
-        ${total.toLocaleString()}
+      <Typography
+        variant="h3"
+        color="text.highlight"
+        gutterBottom
+      >
+        ${total.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}
       </Typography>
       <Button variant="contained" onClick={onDownload}>
         Download Report

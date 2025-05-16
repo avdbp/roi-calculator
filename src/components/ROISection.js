@@ -20,7 +20,7 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
   const [annualCost, setAnnualCost] = useState("");
   const [conversations, setConversations] = useState("");
   const [percentShifted, setPercentShifted] = useState(0);
-  const [autoCostPerConversation, setAutoCostPerConversation] = useState("");
+  const [autoCostPerConversation, setAutoCostPerConversation] = useState("1");
 
   const daysPerYear = 260;
   const emp = parseFloat(employees) || 0;
@@ -119,6 +119,7 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
           <TextField
             fullWidth
             label="Automated cost per conversation"
+            helperText={parseFloat(autoCostPerConversation || "0") <= 0 ? "Introduce un valor mayor que 0 para calcular el ROI." : "Costo estimado por conversación automatizada (ej. chatbots, IA, formularios)"}
             InputLabelProps={{ shrink: true }}
             type="number"
             value={autoCostPerConversation}
