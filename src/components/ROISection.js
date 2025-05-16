@@ -119,7 +119,7 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
           <TextField
             fullWidth
             label="Automated cost per conversation"
-            helperText={parseFloat(autoCostPerConversation || "0") <= 0 ? "Introduce un valor mayor que 0 para calcular el ROI." : "Costo estimado por conversación automatizada (ej. chatbots, IA, formularios)"}
+            helperText={parseFloat(autoCostPerConversation || "0") <= 0 ? "Please enter a value greater than 0 to calculate ROI." : "Estimated cost per automated conversation (e.g. chatbots, AI, forms)"}
             InputLabelProps={{ shrink: true }}
             type="number"
             value={autoCostPerConversation}
@@ -168,7 +168,7 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
 
       {savings < 0 && (
         <Alert severity="warning" sx={{ mt: 2 }}>
-          ⚠️ No se genera ahorro con estos valores. El costo actual por conversación es menor al automatizado.
+          ⚠️ No savings generated with these values. The current cost per conversation is lower than the automated one.
         </Alert>
       )}
     </Paper>
