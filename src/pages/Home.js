@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
@@ -43,6 +43,16 @@ const Home = () => {
   const [showSupport, setShowSupport] = useState(true);
   const [showCoaching, setShowCoaching] = useState(true);
   const [showDevelopment, setShowDevelopment] = useState(true);
+
+  useEffect(() => {
+    if (!showSupport) setSupportData(null);
+  }, [showSupport]);
+  useEffect(() => {
+    if (!showCoaching) setCoachingData(null);
+  }, [showCoaching]);
+  useEffect(() => {
+    if (!showDevelopment) setDevData(null);
+  }, [showDevelopment]);
 
   const grandTotal =
     (supportData?.savings || 0) +

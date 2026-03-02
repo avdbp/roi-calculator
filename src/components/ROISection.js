@@ -19,7 +19,7 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
   const [employees, setEmployees] = useState("");
   const [annualCost, setAnnualCost] = useState("");
   const [conversations, setConversations] = useState("");
-  const [percentShifted, setPercentShifted] = useState(0);
+  const [percentShifted, setPercentShifted] = useState(20);
   const [autoCostPerConversation, setAutoCostPerConversation] = useState("1");
 
   const daysPerYear = 260;
@@ -53,18 +53,23 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
       roi,
     });
   }, [
+    title,
     employees,
     annualCost,
     conversations,
     percentShifted,
     autoCostPerConversation,
+    emp,
+    conv,
+    annCost,
+    autoCostConv,
     savings,
     currentCost,
     autoCost,
     shiftedConversations,
     totalConversations,
     roi,
-    onTotalChange
+    onTotalChange,
   ]);
 
   return (
@@ -111,8 +116,8 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
             min={0}
             max={100}
           />
-          <Typography variant="body2">
-            Percentage of conversations shifted: {percentShifted}%
+          <Typography variant="body2" color="text.secondary">
+            Porcentaje de conversaciones automatizadas: {percentShifted}%. Ajusta este valor para ver los ahorros estimados.
           </Typography>
         </Grid>
         <Grid item xs={12}>
