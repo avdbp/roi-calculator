@@ -30,7 +30,7 @@ const Home = () => {
         ROI Calculator
       </Typography>
       <Typography variant="subtitle1">
-        Estima los ahorros que puedes lograr mediante automatización en atención al cliente, ventas y desarrollo comercial.
+        Estimate your savings through automation in Customer Support, Sales Coaching and Sales Development.
       </Typography>
     </Box>
   );

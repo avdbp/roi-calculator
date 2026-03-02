@@ -15,12 +15,21 @@ import {
   Alert,
 } from "@mui/material";
 
+const DEFAULT_VALUES = {
+  employees: "10",
+  annualCost: "45000",
+  conversations: "30",
+  percentShifted: 25,
+  autoCostPerConversation: "0.50",
+};
+
 const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
-  const [employees, setEmployees] = useState("");
-  const [annualCost, setAnnualCost] = useState("");
-  const [conversations, setConversations] = useState("");
-  const [percentShifted, setPercentShifted] = useState(20);
-  const [autoCostPerConversation, setAutoCostPerConversation] = useState("1");
+  const mergedDefaults = { ...DEFAULT_VALUES, ...defaultValues };
+  const [employees, setEmployees] = useState(mergedDefaults.employees ?? "");
+  const [annualCost, setAnnualCost] = useState(mergedDefaults.annualCost ?? "");
+  const [conversations, setConversations] = useState(mergedDefaults.conversations ?? "");
+  const [percentShifted, setPercentShifted] = useState(mergedDefaults.percentShifted ?? 20);
+  const [autoCostPerConversation, setAutoCostPerConversation] = useState(mergedDefaults.autoCostPerConversation ?? "1");
 
   const daysPerYear = 260;
   const emp = parseFloat(employees) || 0;
@@ -82,6 +91,7 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
           <TextField
             fullWidth
             label="Employees"
+            placeholder="e.g. 10"
             InputLabelProps={{ shrink: true }}
             type="number"
             value={employees}
@@ -91,7 +101,8 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
-            label="Annual cost per employee"
+            label="Annual cost per employee ($)"
+            placeholder="e.g. 45,000"
             InputLabelProps={{ shrink: true }}
             type="number"
             value={annualCost}
@@ -102,6 +113,7 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
           <TextField
             fullWidth
             label="Conversations per day"
+            placeholder="e.g. 25"
             InputLabelProps={{ shrink: true }}
             type="number"
             value={conversations}
@@ -117,13 +129,14 @@ const ROISection = ({ title, onTotalChange, defaultValues = {} }) => {
             max={100}
           />
           <Typography variant="body2" color="text.secondary">
-            Porcentaje de conversaciones automatizadas: {percentShifted}%. Ajusta este valor para ver los ahorros estimados.
+            Percentage of conversations shifted to automation: {percentShifted}%. Adjust this value to see estimated savings.
           </Typography>
         </Grid>
         <Grid item xs={12}>
           <TextField
             fullWidth
-            label="Automated cost per conversation"
+            label="Automated cost per conversation ($)"
+            placeholder="e.g. 0.50"
             helperText={parseFloat(autoCostPerConversation || "0") <= 0 ? "Please enter a value greater than 0 to calculate ROI." : "Estimated cost per automated conversation (e.g. chatbots, AI, forms)"}
             InputLabelProps={{ shrink: true }}
             type="number"
